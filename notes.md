@@ -30,6 +30,7 @@ Now go to `http://127.0.0.1:8000/` or `http://localhost:8000/` in a browser to s
 
 Login to admin at `http://localhost:8000/admin`.
 
+#### install Django REST Framework
 ```bash
 $ # install django REST framework
 $ pip install djangorestframework 
