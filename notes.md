@@ -1,6 +1,7 @@
 # Notes: 📝
 ## Build an API with authenication functionality
 
+#### Project Set Up
 ```bash
 $ # create virtual environment
 $ virtualenv venv
@@ -24,5 +25,36 @@ $ # start django server
 $ python manage.py runserver
 ```
 
+
 Now go to `http://127.0.0.1:8000/` or `http://localhost:8000/` in a browser to see if everything is kosher so far. You should see a little 🚀 success message.
-Login to admin at `http://localhost:8000/admin`
+
+Login to admin at `http://localhost:8000/admin`.
+
+```bash
+$ # install django REST framework
+$ pip install djangorestframework 
+$ # DRF docs suggest the next two dependencies
+$ # Markdown support for the browsable API.
+$ pip install markdown
+$ # Filtering support
+$ pip install django-filter  
+```
+
+Add `'rest_framework', `to `INSTALLED_APPS` in `project-name/settings.py`
+```python
+INSTALLED_APPS = [
+    ...
+    'rest_framework',
+]
+```
+
+If you're intending to use the browsable API you'll probably also want to add REST framework's login and logout views. Add the following to your root `urls.py` file. (note: path can be anything)
+```python
+from django.urls import path, include
+# throw on that include
+
+urlpatterns = [
+    ...
+    path('api-auth/', include('rest_framework.urls'))
+]
+```
