@@ -1,7 +1,7 @@
 # Notes: 📝
 ## Build an API with authenication functionality
 
-'''bash
+```bash
 $ # create virtual environment
 $ virtualenv venv
 $ # activate venv
@@ -22,6 +22,7 @@ $ python manage.py createsuperuser
 $ # follow prompts
 $ # start django server
 $ python manage.py runserver
-'''
+```
+
 Now go to `http://127.0.0.1:8000/` or `http://localhost:8000/` in a browser to see if everything is kosher so far. You should see a little 🚀 success message.
 Login to admin at `http://localhost:8000/admin`
