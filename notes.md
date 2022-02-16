@@ -1,7 +1,7 @@
 # Notes: 📝
 ## Build an API with authenication functionality
 
-#### Project Set Up
+### Project Set Up
 ```bash
 $ # create virtual environment
 $ virtualenv venv
@@ -60,7 +60,7 @@ urlpatterns = [
 ]
 ```
 
-#### Start Django App
+### Start Django App
 Now we need a django app inside of the project.
 ```bash
 $ python manage.py startapp <app-name>
@@ -295,3 +295,18 @@ class MyTokenObtainPairView(TokenObtainPairView):
 ```
 
 now at `http://localhost:8000/api/users/login/` (or whatever url path), My Token Obtain Pair view can log a user in and return JWT and other specified info
+
+---
+
+### Set up CORS Headers
+You need to allow outside sources to connect to the API, like Postman.
+[Django CORS](https://github.com/adamchainz/django-cors-headers)
+```bash
+$ # install library
+$ pip install django-cors-headers
+$ # update dependencies txt
+$ pip freeze > requirements.txt
+```
+In `settings.py`, add to INSTALLED_APPS, the middleware, and CORS_ALLOWED_ORIGINS
+
+
