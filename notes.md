@@ -294,8 +294,6 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 ```
 
-now at `http://localhost:8000/api/users/login/` (or whatever url path), My Token Obtain Pair view can log a user in and return JWT and other specified info
-
 ---
 
 ### Set up CORS Headers
@@ -309,4 +307,15 @@ $ pip freeze > requirements.txt
 ```
 In `settings.py`, add to INSTALLED_APPS, the middleware, and CORS_ALLOWED_ORIGINS
 
+---
 
+now at `http://localhost:8000/api/users/login/` (or whatever url path), My Token Obtain Pair view can log a user in and return JWT and other specified info.  
+
+this also means sending data to `http://localhost:8000/api/users/login/` from a frontend or API testing tool like Postman, you can get your token and log in.
+
+```json
+{
+    "username": "<your-name>",
+    "password": "<your-pass>"
+}
+```
