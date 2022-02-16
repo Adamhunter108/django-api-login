@@ -60,6 +60,7 @@ urlpatterns = [
 ]
 ```
 
+#### Start Django App
 Now we need a django app inside of the project.
 ```bash
 $ python manage.py startapp <app-name>
@@ -73,6 +74,17 @@ INSTALLED_APPS = [
 ]
 ```
 
+now add a route that points to the app in the root `urls.py`
+```python
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/', include('<app-name>.urls')),
+
+]
+
+```
+
+---
 ### Authentication:
 [DRF Token Authentication](https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication)
 Authenticate through DRF API using token authentication: 
@@ -90,10 +102,103 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
+```
+
+create `<app-name>/urls.py`
+
+in `<app-name>/urls.py`, include routes for Simple JWT’s TokenObtainPairView (and TokenRefreshView) views:
+```python
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
+urlpatterns = [
+    ...
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    ...
+]
+
+# note: can change the url paths to something like 
+path('users/login/', views.MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
+```
+
+point root `urls.py` to app-name.urls:
+```python
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/', include('api.urls')),
+]
+```
+
+
+Customize Token in `settings.py`:
+```python
+
+# Customize the JWT Token:
+# https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    # 'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
+
+    'ALGORITHM': 'HS256',
+    # 'SIGNING_KEY': settings.SECRET_KEY, # this was throwing an error
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+    'JWK_URL': None,
+    'LEEWAY': 0,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+
+    'JTI_CLAIM': 'jti',
+
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}
 
 ```
 
----
+in app/`views.py`:
+```python
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Add custom claims
+        token['name'] = user.name
+        # ...
+
+        return token
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
+# or custimize 
+```
+
 
 ```bash
 $ pip freeze > requirements.txt
@@ -111,6 +216,7 @@ Import the django user model and serializers from DRF in  `serializers.py`.  The
 ```python
 from django.contrib.auth.models import  User
 from rest_framework import  serializers
+from rest_framework_simplejwt.tokens import RefreshToken
 
 class  UserSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
@@ -136,4 +242,56 @@ class  UserSerializer(serializers.ModelSerializer):
             name = obj.email
         return name
 
+# extending off UserSerializer
+class UserSerializerWithToken(UserSerializer):
+    token = serializers.SerializerMethodField(read_only=True)
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'name', 'isAdmin', 'token']
+
+    def get_token(self, obj):
+        token = RefreshToken.for_user(obj)
+        return str(token.access_token)
+
+    # generating (serializing) a user, take that user object and return back another token with the initial response
 ```
+
+and now the actual views:
+```python
+from django.shortcuts import render
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import UserSerializer, UserSerializerWithToken
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    # @classmethod
+    # def get_token(cls, user):
+    #     token = super().get_token(user)
+
+    #     # Add custom claims
+    #     token['username'] = user.username
+    #     token['message'] = 'why is the sky blue?  why is water wet?'
+
+    #     return token
+
+    # commented out function above puts the username and a message encrypted into the access token
+    # below function serializes data and makes it accessible in the API, making it easier to grab from the frontend
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        # data['username'] = self.user.username
+        # data['email'] = self.user.email
+
+        # changing to for loop to output the data from the serializer instead of adding manually
+        serializer = UserSerializerWithToken(self.user).data
+        for key, value in serializer.items():
+            data[key] = value
+
+        return data
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
+```
+
+now at `http://localhost:8000/api/users/login/` (or whatever url path), My Token Obtain Pair view can log a user in and return JWT and other specified info
