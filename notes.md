@@ -309,6 +309,7 @@ In `settings.py`, add to INSTALLED_APPS, the middleware, and CORS_ALLOWED_ORIGIN
 
 ---
 
+### Log in user
 now at `http://localhost:8000/api/users/login/` (or whatever url path), My Token Obtain Pair view can log a user in and return JWT and other specified info.  
 
 this also means sending data to `http://localhost:8000/api/users/login/` from a frontend or API testing tool like Postman, you can get your token and log in.
@@ -318,4 +319,72 @@ this also means sending data to `http://localhost:8000/api/users/login/` from a 
     "username": "<your-name>",
     "password": "<your-pass>"
 }
+```
+
+---
+
+### Register a user
+
+in `views.py`:
+```python
+@api_view(['POST'])
+def registerUser(request):
+    data = request.data
+    # print(data)
+    
+    try:
+        user = User.objects.create(
+            first_name=data['name'],
+            username=data['email'],
+            email=data['email'],
+            password=make_password(data['password'])
+        )
+        serializer = UserSerializerWithToken(user, many=False)
+        return Response(serializer.data)
+    except:
+        message = {'detail':'That email is already registered with us.'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
+```
+
+then in `urls.py`:
+```python
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('users/login/', views.MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('users/register/', views.registerUser, name='register'),
+]
+```
+
+now at `http://localhost:8000/api/users/register/` you can register a new user by sending name, email and password:
+```json
+{
+    "name": "snoopy",
+    "email": "snoopy@aol.com",
+    "password": "woodstock"
+}
+```
+
+---
+### Get logged in users data
+send Bearer token from login to `http://localhost:8000/api/users/profile/` to get user's data.
+```python
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getUserProfile(request):
+    user = request.user
+    serializer = UserSerializer(user, many=False)
+    return Response(serializer.data)
+```
+---
+### Get all users (if admin)
+if token is from an admin user, you can send Bearer token to `http://localhost:8000/api/users/` to get a list of registered users
+```python
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def getUsers(request):
+    users = User.objects.all()
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data)
 ```
