@@ -456,3 +456,23 @@ def updateUser(request, pk):
 ```python
 path('users/update/<str:pk>/', views.updateUser, name='user-update'),
 ```
+
+---
+
+### Docker:
+
+add `‘*’` to ALLOWED_HOSTS in `settings.py`
+```python
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "*").split(" ")
+```
+
+changed all necessary settings.py environment variables, wrote the docker, dockerignore, and docker-compose files but docker-compose won't build the image.  keep getting same error:
+```
+$ docker-compose up --build
+ERROR: 
+        Can't find a suitable configuration file in this directory or any
+        parent. Are you in the right directory?
+
+        Supported filenames: docker-compose.yml, docker-compose.yaml
+
+```
