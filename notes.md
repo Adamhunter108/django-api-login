@@ -388,3 +388,71 @@ def getUsers(request):
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data)
 ```
+
+---
+
+### Delete user:
+in `views.py`:
+```python
+@api_view(['DELETE'])
+@permission_classes([IsAdminUser])
+def deleteUser(request, pk):
+    userForDeletion = User.objects.get(id=pk)
+    userForDeletion.delete()
+    return Response('User was deleted')
+```
+`urls.py`:
+```python
+    ...
+    path('users/delete/<str:pk>/', views.deleteUser, name='user-delete')
+    ...
+    # dynamic value for string value for primary key which is the user ID
+```
+
+### Get user by ID
+`views.py`
+```python
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def getUserById(request, pk):
+    user = User.objects.get(id=pk)
+    serializer = UserSerializer(user, many=False)
+    return Response(serializer.data)
+```
+`urls.py`:
+```python
+path('users/<str:pk>/', views.getUserById, name='user'),
+# same dynamic route for ID
+```
+
+If admin, send Bearer token to `http://localhost:8000/api/users/{id}` specific user data
+---
+
+### Update user: (user can update their own profile)
+If logged in, send Bearer token to `http://localhost:8000/api/users/update/{id}` to update data
+
+`views.py`
+```python
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def updateUser(request, pk):
+    user = User.objects.get(id=pk)
+
+    data = request.data
+
+    user.first_name = data['name']
+    user.username = data['email']
+    user.email = data['email']
+    user.is_staff = data['isAdmin']
+    # .is_staff is django admin
+
+    user.save()
+
+    serializer = UserSerializer(user, many=False)
+
+    return Response(serializer.data)
+```
+`urls.py`
+```python
+path('users/update/<str:pk>/', views.updateUser, name='user-update'),
+```
