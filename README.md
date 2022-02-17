@@ -9,37 +9,37 @@ The API features JWT (JSON Web Token) authentication, and full CRUD (Create, Rea
 ### `API URL Paths:`
 
 #### Register an account:
-```json
+```javascript
 {URL}/api/users/register
 ```
 
 #### Log into an account:
-```json
+```javascript
 {URL}/api/users/login
 ```
 
 #### Get logged in user's data:
-```json
+```javascript
 {URL}/api/users/profile
 ```
 
 #### Get all app users' data (admin only):
-```json
+```javascript
 {URL}/api/users/
 ```
 
 #### Get a specific user's data (admin only):
-```json
+```javascript
 {URL}/api/users/{id}
 ```
 
 #### Update logged in user's data:
-```json
+```javascript
 {URL}/api/users/update/{id}
 ```
 
 #### Delete a user's account:
-```json
+```javascript
 {URL}/api/users/delete/{id}
 ```
 
