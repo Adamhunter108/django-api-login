@@ -8,39 +8,39 @@ The API features JWT (JSON Web Token) authentication, and full CRUD (Create, Rea
 
 ### `API URL Paths:`
 
-Register an account:
-```
-http://localhost:8000/api/users/register
-```
-
-Log into an account:
-```
-http://localhost:8000/api/users/login
+#### Register an account:
+```json
+{URL}/api/users/register
 ```
 
-Get logged in user's data:
-```
-http://localhost:8000/api/users/profile
-```
-
-Get all app users' data (admin only):
-```
-http://localhost:8000/api/users/
+#### Log into an account:
+```json
+{URL}/api/users/login
 ```
 
-Get a specific user's data (admin only):
-```
-http://localhost:8000/api/users/{id}
-```
-
-Update logged in user's data:
-```
-http://localhost:8000/api/users/update/{id}
+#### Get logged in user's data:
+```json
+{URL}/api/users/profile
 ```
 
-Delete a user's account:
+#### Get all app users' data (admin only):
+```json
+{URL}/api/users/
 ```
-http://localhost:8000/api/users/delete/{id}
+
+#### Get a specific user's data (admin only):
+```json
+{URL}/api/users/{id}
+```
+
+#### Update logged in user's data:
+```json
+{URL}/api/users/update/{id}
+```
+
+#### Delete a user's account:
+```json
+{URL}/api/users/delete/{id}
 ```
 
 
@@ -65,6 +65,7 @@ $ # create superuser so you can login to /admin
 $ python manage.py createsuperuser
 $ # follow prompts
 $ # start django server
-$ python manage.py runserver
+$ python manage.py runserver 
+$ # if no port specified, django serves at port 8000$ 
 ```
-Unless specified otherwise, the API will be available at port: 8000 
+>note: you may specify a port as an argument on the last command, if no port specified, django serves at port 8000 (or `http://127.0.0.1:8000/` or `http://localhost:8000/`)
