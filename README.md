@@ -66,6 +66,5 @@ $ python manage.py createsuperuser
 $ # follow prompts
 $ # start django server
 $ python manage.py runserver 
-$ # if no port specified, django serves at port 8000$ 
 ```
 >note: you may specify a port as an argument on the last command, if no port specified, django serves at port 8000 (or `http://127.0.0.1:8000/` or `http://localhost:8000/`)
