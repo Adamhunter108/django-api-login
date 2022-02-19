@@ -43,9 +43,15 @@ The API features JWT (JSON Web Token) authentication, and full CRUD (Create, Rea
 {URL}/api/users/delete/{id}
 ```
 
+---
+
+View my [blog post](https://adamhunter.website/django-rest-framework-api/) about building this.
+
+---
+
 
 ### `Run Locally:`
----
+
 #### `Requirements:`
 * Python 3   <img src="https://cdn.worldvectorlogo.com/logos/python-5.svg" width="25" height="25"/>
 ---
@@ -53,17 +59,23 @@ The API features JWT (JSON Web Token) authentication, and full CRUD (Create, Rea
 ```bash
 $ # change into backend directory
 $ cd backend
+$
 $ # create virtual environment
 $ virtualenv venv
+$
 $ # activate venv
 $ . venv/bin/activate # for mac/linux
+$
 $ # install dependencies
 $ pip install -r requirements.txt
+$
 $ # migrate admin and auth to SQLite db
 $ python manage.py migrate
+$
 $ # create superuser so you can login to /admin
 $ python manage.py createsuperuser
 $ # follow prompts
+$
 $ # start django server
 $ python manage.py runserver 
 ```

@@ -456,3 +456,5 @@ def updateUser(request, pk):
 ```python
 path('users/update/<str:pk>/', views.updateUser, name='user-update'),
 ```
+
+Goodbye.
