@@ -44,11 +44,7 @@ The API features JWT (JSON Web Token) authentication, and full CRUD (Create, Rea
 ```
 
 ---
-
-View my [blog post](https://adamhunter.website/django-rest-framework-api/) about building this.
-
 ---
-
 
 ### `Run Locally:`
 
